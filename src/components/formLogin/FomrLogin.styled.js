@@ -3,11 +3,14 @@ import Form  from "react-bootstrap/Form"
 import Button  from "react-bootstrap/Button"
 
 export const Group = styled(Form.Group)`
-    margin-top: 10px;
+    margin: 15px 0px 15px 0px;
+    text-align: start;
 `
-
-
 export const ButtonS =  styled(Button)`
- width: 80px;
- }
+    width:100%; 
+`
+export const DivForm = styled(Form)`
+    @media (max-width: 480px) {
+        width: 300px;
+    }
 `

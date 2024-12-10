@@ -5,7 +5,7 @@ import App from './app/App';
 import reportWebVitals from './utils/reportWebVitals';
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import Login from './routes/login/Login';
-import Home from './routes/home';
+import Home from './routes/home/Home';
 
 
 const router = createBrowserRouter([
