@@ -3,11 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Spinner from "react-bootstrap/Spinner";
-<<<<<<< HEAD
 import { Group, ButtonS, DivForm } from "./FomrLogin.styled.js";
-=======
-import { Group, ButtonS, DivForm } from "./FomrLogin.styled";
->>>>>>> 2ce0f68c035833700745dea0e2ece13ec3301da5
+
 
 const FormLogin = () => {
   const navigate = useNavigate();

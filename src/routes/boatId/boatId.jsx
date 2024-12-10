@@ -1,18 +1,16 @@
 import React, { useEffect } from "react";
-import { Wrapper } from "./BoatId.styled.js";
+import { Wrapper, Content } from "./BoatId.styled.js";
+import CarouselsImages from "../../components/carouselsImages/CarouselsImages.jsx"
+import Barco from "../../assets/Barco.webp"
+import Logo from "../../assets/logo.jpg"
 
 const BoatId = () => {
-    const navigate = useNavigate();
-    const token = localStorage.getItem("token");
-    console.log(token);
-  
-    useEffect(() => {
-      if (!token) {
-        navigate('/');
-      }
-    }, [navigate, token]); 
+    const imagesUrlProps = [Barco, Logo]
     return(
-        <Wrapper></Wrapper>
+        <Wrapper>
+            <CarouselsImages imagesUrl={imagesUrlProps}/>
+            <Content/>
+        </Wrapper>
     )
 
 }
