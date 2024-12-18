@@ -10,7 +10,7 @@ export const LightTheme = createTheme({
             contrastText: '#ffffff' ,
         },
         background: {
-            paper: '#BFB19F'
+            paper: '#D9D4D0'
         }
     }
 })

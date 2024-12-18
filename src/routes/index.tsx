@@ -1,12 +1,17 @@
 import { Route, Routes, Navigate } from "react-router-dom"
-import { Button } from "@mui/material"
+import {Home, HomeA} from '../pages/index'
+import Login from "../pages/login/Login"
 
 
 export const RoutesConfig = () => {
+
     return(
         <Routes>
-            <Route path="/home" element={<Button variant="contained" color='primary'>HOME</Button>}/>
-            <Route path="*" element={<Navigate to="/home"/>}/>
+            <Route path="/home" element={<Home />} />
+            <Route path="/hoje" element={<HomeA />} />
+            <Route path="/" element={<Login />} />
+
+            <Route path="*" element={<Navigate to="/"/>}/>
 
 
         </Routes>
