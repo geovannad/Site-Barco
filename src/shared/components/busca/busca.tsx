@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Dispatch, SetStateAction, useState } from "react";
 import {
   Box,
   Button,
@@ -9,11 +9,42 @@ import {
   Paper,
   Collapse,
   IconButton,
-} from '@mui/material';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import ClearIcon from '@mui/icons-material/Clear';
+} from "@mui/material";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import ClearIcon from "@mui/icons-material/Clear";
 
-const BarraBusca: React.FC = () => {
+
+interface BarraBuscaProps {
+  searchQuery: string;
+  setSearchQuery: Dispatch<SetStateAction<string>>;
+  filters: {
+    status: string;
+    valorMin: number;
+    valorMax: number;
+    tamanhoMin: number;
+    tamanhoMax: number;
+  };
+  setFilters: Dispatch<
+    SetStateAction<{
+      status: string;
+      valorMin: number;
+      valorMax: number;
+      tamanhoMin: number;
+      tamanhoMax: number;
+    }>
+  >;
+  applyFilters: () => void;
+  clearFilters: () => void;
+}
+
+const BarraBusca: React.FC<BarraBuscaProps> = ({
+  searchQuery,
+  setSearchQuery,
+  filters,
+  setFilters,
+  applyFilters,
+  clearFilters,
+}) => {
   const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
 
   const toggleFilters = () => setIsFiltersExpanded((prev) => !prev);
@@ -21,18 +52,17 @@ const BarraBusca: React.FC = () => {
   return (
     <Paper
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        flexDirection: "column",
         gap: 2,
         padding: 2,
       }}
     >
-      {/* Barra de busca e botão de filtro */}
       <Box
         sx={{
-          display: 'flex',
+          display: "flex",
           gap: 1,
-          alignItems: 'center',
+          alignItems: "center",
         }}
       >
         <TextField
@@ -40,50 +70,59 @@ const BarraBusca: React.FC = () => {
           variant="outlined"
           size="small"
           placeholder="Digite o que procura..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)} 
         />
 
-        {/* Botão de filtro com ícone */}
+        
         <IconButton
           onClick={toggleFilters}
           color="primary"
           sx={{
-            border: '1px solid',
-            borderColor: 'divider',
+            border: "1px solid",
+            borderColor: "divider",
             padding: 1,
           }}
         >
           <FilterAltIcon />
         </IconButton>
       </Box>
-
-      {/* Filtros expansíveis */}
       <Collapse in={isFiltersExpanded}>
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
+            display: "flex",
+            flexDirection: "column",
             gap: 2,
             mt: 2,
           }}
         >
-          {/* Filtro de Status */}
           <Select
-            defaultValue="Ativas e Pendentes"
+            value={filters.status}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, status: e.target.value }))
+            }
             size="small"
             fullWidth
           >
             <MenuItem value="Ativas e Pendentes">Ativas e Pendentes</MenuItem>
-            <MenuItem value="Ativas">Ativas</MenuItem>
+            <MenuItem defaultChecked value="Ativas">Ativas</MenuItem>
             <MenuItem value="Pendentes">Pendentes</MenuItem>
           </Select>
 
-          {/* Filtros de Valores */}
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          
+          <Box sx={{ display: "flex", gap: 1 }}>
             <TextField
               label="Valor Mínimo"
               variant="outlined"
               size="small"
               type="number"
+              value={filters.valorMin}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  valorMin: Number(e.target.value),
+                }))
+              }
               fullWidth
             />
             <TextField
@@ -91,17 +130,29 @@ const BarraBusca: React.FC = () => {
               variant="outlined"
               size="small"
               type="number"
+              value={filters.valorMax}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  valorMax: Number(e.target.value),
+                }))
+              }
               fullWidth
             />
           </Box>
-
-          {/* Filtros de Tamanho */}
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: "flex", gap: 1 }}>
             <TextField
               label="Tamanho Mínimo"
               variant="outlined"
               size="small"
               type="number"
+              value={filters.tamanhoMin}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  tamanhoMin: Number(e.target.value),
+                }))
+              }
               fullWidth
             />
             <TextField
@@ -109,25 +160,35 @@ const BarraBusca: React.FC = () => {
               variant="outlined"
               size="small"
               type="number"
+              value={filters.tamanhoMax}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  tamanhoMax: Number(e.target.value),
+                }))
+              }
               fullWidth
             />
           </Box>
 
           <Divider sx={{ my: 2 }} />
-
-          {/* Botões de ação */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+          <Box
+            sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}
+          >
             <Button
               variant="outlined"
-              startIcon={<ClearIcon />}
+              size="small"
               fullWidth
+              onClick={clearFilters}
+              startIcon={<ClearIcon />}
             >
               Limpar
             </Button>
             <Button
               variant="contained"
-              startIcon={<FilterAltIcon />}
+              size="small"
               fullWidth
+              onClick={applyFilters}
             >
               Aplicar
             </Button>
@@ -137,7 +198,5 @@ const BarraBusca: React.FC = () => {
     </Paper>
   );
 };
-
-
 
 export default BarraBusca;

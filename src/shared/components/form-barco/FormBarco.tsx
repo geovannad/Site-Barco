@@ -1,0 +1,730 @@
+import React, { useEffect, useState } from "react";
+import {
+    Box,
+    Grid,
+    TextField,
+    Checkbox,
+    FormControlLabel,
+    Button,
+    MenuItem,
+    Typography,
+    CircularProgress,
+    Alert,
+    FormControl,
+    InputLabel,
+    Select,
+    OutlinedInput,
+    ListItemText,
+} from "@mui/material";
+
+interface BoatResponse {
+    id: string;
+    idBarco: number;
+    photos: string[];
+    manufacturer: string;
+    model: string;
+    size: number;
+    year: number;
+    nameVessel: string;
+    marina?: string;
+    value: number;
+    mark?: string;
+    amount: number;
+    modelPower: string;
+    yearEngine: number;
+    hours: number;
+    fuel: number;
+    ips: boolean;
+    surface?: boolean;
+    bridle: boolean;
+    stern: boolean;
+    outdrive?: string;
+    pickups?: string[] | undefined;
+    sailor?: Sailor;
+    owner?: Owner;
+    announcement?: Announcement;
+    keywords: string[];
+    equipment: string[];
+    status: string;
+    observationsAdm?: string;
+    observationsPublish?: string;
+}
+
+interface Sailor {
+    name: string;
+    number: string;
+    email: string;
+}
+
+interface Owner {
+    name: string;
+    number: string;
+    email: string;
+}
+
+interface Announcement {
+    announceSite: boolean;
+    announceMercadoLivre: boolean;
+    announceBombarco: boolean;
+    announceInstagram: boolean;
+}
+
+interface IBoatFormProps {
+    idBarco: string | null;
+}
+
+const STATUS_OPTIONS = ["Available", "Sold", "Reserved"];
+const EQUIPMENT_OPTIONS = [
+    "GPS",
+    "Radar",
+    "Sound System",
+    "Fish Finder",
+    "Anchor",
+    "Life Jackets",
+];
+
+const BoatForm: React.FC<IBoatFormProps> = ({ idBarco }) => {
+    const [formData, setFormData] = useState<BoatResponse>({
+        id: "",
+        idBarco: 0,
+        photos: [],
+        manufacturer: "",
+        model: "",
+        size: 0,
+        year: new Date().getFullYear(),
+        nameVessel: "",
+        marina: "",
+        value: 0,
+        mark: "",
+        amount: 0,
+        modelPower: "",
+        yearEngine: new Date().getFullYear(),
+        hours: 0,
+        fuel: 0,
+        ips: false,
+        surface: false,
+        bridle: false,
+        stern: false,
+        outdrive: "",
+        pickups: [],
+        sailor: { name: "", number: "", email: "" },
+        owner: { name: "", number: "", email: "" },
+        announcement: {
+            announceSite: false,
+            announceMercadoLivre: false,
+            announceBombarco: false,
+            announceInstagram: false,
+        },
+        keywords: [],
+        equipment: [],
+        status: "",
+        observationsAdm: "",
+        observationsPublish: "",
+    });
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const token = localStorage.getItem("token");
+        setFieldErrors({}); // Limpar erros anteriores
+        setError(null); // Limpar mensagem geral de erro
+
+        const url = idBarco
+            ? `https://ms-internautica-crm.onrender.com/boat/update/${idBarco}`
+            : "https://ms-internautica-crm.onrender.com/boat/create";
+
+        const method = idBarco ? "PUT" : "POST";
+
+        try {
+            setLoading(true);
+
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `${token}`,
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (response.status == 400) {
+                const result = await response.json();
+                console.log(result);  // Verifique o conteúdo da resposta
+              
+                if (result && Object.keys(result).length > 0) {
+                  // Se o resultado contiver erros, defina os erros no formulário
+                  setFieldErrors(result);
+                } else {
+                  throw new Error(
+                    idBarco
+                      ? "Erro ao atualizar o barco. Verifique os dados e tente novamente."
+                      : "Erro ao criar o barco. Verifique os dados e tente novamente."
+                  );
+                }
+              }
+              
+
+            alert(idBarco ? "Barco atualizado com sucesso!" : "Barco criado com sucesso!");
+        } catch (err: any) {
+            setError(err.message || "Erro desconhecido ao enviar o formulário.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+
+    useEffect(() => {
+        if (!idBarco) return;
+
+        const fetchData = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const response = await fetch(
+                    `https://ms-internautica-crm.onrender.com/boat/get-by-id/${idBarco}`
+                );
+
+                if (!response.ok) {
+                    throw new Error("Erro ao buscar os dados do barco.");
+                }
+
+                const result: BoatResponse = await response.json();
+                setFormData(result);
+                console.log(result);
+            } catch (err: any) {
+                setError(err.message || "Erro desconhecido.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [idBarco]);
+
+    const handleInputChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: checked }));
+    };
+
+    const handleWordInputBlur = () => {
+        const words = (formData.keywords as unknown as string)
+            .split(';')
+            .map((word) => word.trim())
+            .filter((word) => word.length > 0);
+
+        setFormData((prev) => ({
+            ...prev,
+            keywords: words,
+        }));
+    };
+
+    const handleAnnouncementChange = (name: keyof Announcement, checked: boolean) => {
+        setFormData((prev) => ({
+            ...prev,
+            announcement: {
+                ...prev.announcement,
+                [name]: checked,
+            },
+        }));
+    };
+
+    const handleEquipmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = e.target;
+        setFormData((prev) => {
+            const equipment = checked
+                ? [...prev.equipment, name]
+                : prev.equipment.filter((item) => item !== name);
+            return { ...prev, equipment };
+        });
+    };
+
+
+
+    return (
+        <Box component="form" onSubmit={handleSubmit} sx={{ p: 4 }}>
+            {loading ? (
+                <CircularProgress />
+            ) : error ? (
+                <Alert severity="error">{error}</Alert>
+            ) : (
+                <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                        <Typography variant="h6">Fotos</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Button
+                            variant="outlined"
+                            component="label"
+                        >
+                            Upload de Fotos
+                            <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                hidden
+                                onChange={(e) => {
+                                    const files = e.target.files;
+                                    if (files) {
+                                        const newPhotos = Array.from(files).map((file) =>
+                                            URL.createObjectURL(file)
+                                        );
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            photos: [...prev.photos, ...newPhotos],
+                                        }));
+                                    }
+                                }}
+                            />
+                        </Button>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Typography variant="subtitle1">Pré-visualização:</Typography>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                gap: 2,
+                                flexWrap: "wrap",
+                                marginTop: 2,
+                            }}
+                        >
+                            {formData.photos.map((photo, index) => (
+                                <Box
+                                    key={index}
+                                    sx={{
+                                        position: "relative",
+                                        width: 100,
+                                        height: 100,
+                                    }}
+                                >
+                                    <img
+                                        src={photo}
+                                        alt={`Foto ${index + 1}`}
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            objectFit: "cover",
+                                            borderRadius: 8,
+                                        }}
+                                    />
+                                    <Button
+                                        onClick={() => {
+                                            setFormData((prev) => ({
+                                                ...prev,
+                                                photos: prev.photos.filter((_, i) => i !== index),
+                                            }));
+                                        }}
+                                        size="small"
+                                        color="secondary"
+                                        sx={{
+                                            position: "absolute",
+                                            top: 0,
+                                            right: 0,
+                                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                                            color: "#fff",
+                                        }}
+                                    >
+                                        Remover
+                                    </Button>
+                                </Box>
+                            ))}
+                        </Box>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Typography variant="h6">Identificação</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            required
+                            fullWidth
+                            label="Fabricante"
+                            name="manufacturer"
+                            value={formData.manufacturer}
+                            onChange={handleInputChange}
+                            error={!!fieldErrors.manufacturer}
+                            helperText={fieldErrors.manufacturer || ""}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            fullWidth
+                            label="Modelo"
+                            name="model"
+                            value={formData.model}
+                            onChange={handleInputChange}
+                            error={!!fieldErrors.model}
+                            helperText={fieldErrors.model || ""}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            fullWidth
+                            label="Tamanho"
+                            type="number"
+                            name="size"
+                            value={formData.size}
+                            onChange={handleInputChange}
+  error={!!fieldErrors.size}
+  helperText={fieldErrors.size || ""}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            fullWidth
+                            label="Ano"
+                            type="number"
+                            name="year"
+                            value={formData.year}
+                            onChange={handleInputChange}
+  error={!!fieldErrors.year}
+  helperText={fieldErrors.year || ""}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            required
+                            fullWidth
+                            label="Nome da embarcação"
+                            name="nameVessel"
+                            value={formData.nameVessel}
+                            onChange={handleInputChange}
+                            error={!!fieldErrors.nameVessel}
+                            helperText={fieldErrors.nameVessel || ""}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            fullWidth
+                            label="Marina"
+                            name="marina"
+                            value={formData.marina}
+                            onChange={handleInputChange}
+                            error={!!fieldErrors.marina}
+                            helperText={fieldErrors.marina || ""}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            fullWidth
+                            label="Preço"
+                            type="number"
+                            name="value"
+                            value={formData.value}
+                            onChange={handleInputChange}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Typography variant="h6">Motorização</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            fullWidth
+                            label="Modelo/Potência"
+                            name="modelPower"
+                            value={formData.modelPower}
+                            onChange={handleInputChange}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            fullWidth
+                            label="Quantidade"
+                            type="number"
+                            name="amount"
+                            value={formData.amount}
+                            onChange={handleInputChange}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            fullWidth
+                            label="Marca"
+                            name="mark"
+                            value={formData.mark}
+                            onChange={handleInputChange}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            fullWidth
+                            label="Ano"
+                            type="number"
+                            name="yearEngine"
+                            value={formData.yearEngine}
+                            onChange={handleInputChange}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            fullWidth
+                            label="Horas"
+                            type="number"
+                            name="hours"
+                            value={formData.hours}
+                            onChange={handleInputChange}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            fullWidth
+                            label="Combustível"
+                            type="text"
+                            name="fuel"
+                            value={formData.fuel}
+                            onChange={handleInputChange}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={formData.ips}
+                                    onChange={handleCheckboxChange}
+                                    name="ips"
+                                />
+                            }
+                            label="IPS"
+                        />
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={formData.bridle}
+                                    onChange={handleCheckboxChange}
+                                    name="bridle"
+                                />
+                            }
+                            label="Pé de Galinha"
+                        />
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={formData.stern}
+                                    onChange={handleCheckboxChange}
+                                    name="stern"
+                                />
+                            }
+                            label="Popa"
+                        />
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={formData.surface}
+                                    onChange={handleCheckboxChange}
+                                    name="surface"
+                                />
+                            }
+                            label="Superfície"
+                        />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <TextField
+                            fullWidth
+                            label="Rabeta"
+                            name="outdrive"
+                            value={formData.outdrive || ""}
+                            onChange={handleInputChange}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+
+                        <FormControl fullWidth>
+                            <InputLabel id="status-label">Status</InputLabel>
+                            <Select
+                                labelId="status-label"
+                                id="status-select"
+                                value={formData.status}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    setFormData((prev) => ({ ...prev, status: value }));
+                                }}
+                                input={<OutlinedInput label="Status" />}
+                            >
+                                {STATUS_OPTIONS.map((status) => (
+                                    <MenuItem key={status} value={status}>
+                                        {status}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Typography variant="h6">Captação</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+
+                        <FormControl fullWidth>
+                            <InputLabel id="captador-label">Captador</InputLabel>
+                            <Select
+                                labelId="captador-label"
+                                id="captador-select"
+                                multiple
+                                value={formData.pickups || []}
+                                onChange={(e) => {
+                                    const value = e.target.value as string[];
+                                    setFormData((prev) => ({ ...prev, pickups: value }));
+                                }}
+                                input={<OutlinedInput label="Captador" />}
+                                renderValue={(selected) => selected.join(", ")}
+                            >
+                                import React, {useEffect, useState} from "react";
+                                ...
+
+                                {["João", "Maria", "Pedro", "Ana"].map((person) => (
+                                    <MenuItem key={person} value={person}>
+                                        <Checkbox checked={formData.pickups?.includes(person)} />
+                                        <ListItemText primary={person} />
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Typography variant="h6">Proprietário</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            required
+                            fullWidth
+                            label="Nome"
+                            name="owner.name"
+                            value={formData.owner?.name || ""}
+                            onChange={(e) => {
+                                const { value } = e.target;
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    owner: { ...prev.owner, name: value },
+                                }));
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            required
+                            fullWidth
+                            label="Número de Contato"
+                            name="owner.number"
+                            value={formData.owner?.number || ""}
+                            onChange={(e) => {
+                                const { value } = e.target;
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    owner: { ...prev.owner, number: value },
+                                }));
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            fullWidth
+                            label="Email"
+                            name="owner.email"
+                            value={formData.owner?.email || ""}
+                            onChange={(e) => {
+                                const { value } = e.target;
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    owner: { ...prev.owner, email: value },
+                                }));
+                            }}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Typography variant="h6">Palavras-Chave</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            fullWidth
+                            label="Palavras-chave (separadas por ponto e vírgula)"
+                            name="keywords"
+                            value={(formData.keywords as unknown as string) || ""}
+                            onChange={(e) =>
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    keywords: e.target.value,
+                                }))
+                            }
+                            onBlur={handleWordInputBlur}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Typography variant="h6">Equipamentos</Typography>
+                    </Grid>
+                    {EQUIPMENT_OPTIONS.map((equipment) => (
+                        <Grid item xs={6} sm={4} key={equipment}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={formData.equipment.includes(equipment)}
+                                        onChange={handleEquipmentChange}
+                                        name={equipment}
+                                    />
+                                }
+                                label={equipment}
+                            />
+                        </Grid>
+                    ))}
+
+                    <Grid item xs={12}>
+                        <Typography variant="h6">Observações</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            fullWidth
+                            label="Administração"
+                            name="observationsAdm"
+                            value={formData.observationsAdm || ""}
+                            onChange={handleInputChange}
+                            multiline
+                            rows={4}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            fullWidth
+                            label="Publicação"
+                            name="observationsPublish"
+                            value={formData.observationsPublish || ""}
+                            onChange={handleInputChange}
+                            multiline
+                            rows={4}
+                        />
+                    </Grid>
+
+
+
+                    <Grid item xs={12}>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            disabled={loading}
+                        >
+                            {idBarco ? "Atualizar Barco" : "Criar Barco"}
+                        </Button>
+
+                    </Grid>
+                </Grid>
+            )}
+        </Box>
+    );
+};
+
+export default BoatForm;
+

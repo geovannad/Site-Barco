@@ -4,7 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-interface IFerramentasDeDetalheProps {
+interface IBarraCrudProps {
   textoBotaoNovo?: string;
 
   mostrarBotaoNovo?: boolean;
@@ -25,13 +25,13 @@ interface IFerramentasDeDetalheProps {
   aoClicarEmSalvar?: () => void;
   aoClicarEmSalvarEFechar?: () => void;
 }
-export const FerramentasDeDetalhe: React.FC<IFerramentasDeDetalheProps> = ({
+export const BarraCrud: React.FC<IBarraCrudProps> = ({
   textoBotaoNovo = 'Novo',
 
-  mostrarBotaoNovo = true,
-  mostrarBotaoVoltar = true,
-  mostrarBotaoApagar = true,
-  mostrarBotaoSalvar = true,
+  mostrarBotaoNovo = false,
+  mostrarBotaoVoltar = false,
+  mostrarBotaoApagar = false,
+  mostrarBotaoSalvar = false,
   mostrarBotaoSalvarEFechar = false,
 
   mostrarBotaoNovoCarregando = false,

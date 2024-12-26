@@ -39,7 +39,7 @@ const FormLogin: React.FC = () => {
         const token = await response.text();
         if (token) {
           localStorage.setItem("token", token);
-          navigate("/home");
+          navigate("/catalogo");
         }
       } else if (response.status === 401) {
         setErrorMessage("Email ou senha inválidos. Tente novamente.");
@@ -73,21 +73,17 @@ const FormLogin: React.FC = () => {
         fullWidth
       />
 
-      {/* Checkbox */}
       <FormControlLabel
         control={<Checkbox />}
         label="Lembre-me"
         sx={{ mt: 2 }}
       />
-
-      {/* Mensagem de Erro */}
       {errorMessage && (
         <Typography color="error" sx={{ mt: 2, fontSize: "14px" }}>
           {errorMessage}
         </Typography>
       )}
 
-      {/* Botão de Login */}
       <Button
         onClick={login}
         variant="contained"
