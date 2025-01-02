@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   TextField,
@@ -16,6 +16,16 @@ const FormLogin: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
+
+  // Verificar se o email foi armazenado no localStorage quando o componente for montado
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("email");
+    if (storedEmail) {
+      setEmail(storedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   const login = async () => {
     if (!email || !password) {
@@ -54,6 +64,15 @@ const FormLogin: React.FC = () => {
     }
   };
 
+  const handleRememberMeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRememberMe(event.target.checked);
+    if (event.target.checked) {
+      localStorage.setItem("email", email); // Salvar email no localStorage
+    } else {
+      localStorage.removeItem("email"); // Remover email do localStorage
+    }
+  };
+
   return (
     <StyledBox>
       <TextField
@@ -74,7 +93,7 @@ const FormLogin: React.FC = () => {
       />
 
       <FormControlLabel
-        control={<Checkbox />}
+        control={<Checkbox checked={rememberMe} onChange={handleRememberMeChange} />}
         label="Lembre-me"
         sx={{ mt: 2 }}
       />

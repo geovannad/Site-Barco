@@ -1,18 +1,32 @@
 import React, { useState } from 'react';
+import {sleep} from 'sleep-ts'
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import { Alert, Snackbar } from '@mui/material';
 
 interface ITabela {
   rows?: any[];
   loading?: boolean;
 }
 
+
+
 const columns: GridColDef[] = [
   { field: 'id', headerName: 'ID', width: 70, type: "string"},
-  { field: 'photo', headerName: 'Foto', width: 70 },
+  {
+    field: 'photo', headerName: 'Foto', width: 70, renderCell: (params) => {
+      return (
+        <img
+          src={params.value} // Assume que params.value contém o URL da imagem
+          alt="Boat Photo"
+          style={{ width: 50, height: 50, objectFit: 'cover' }} // Ajuste o estilo conforme necessário
+        />
+      );
+    }
+  },
   { field: 'name', headerName: 'Nome', width: 130 },
   { field: 'manufacturer', headerName: 'Fabricante', width: 160 },
   { field: 'model', headerName: 'Modelo', width: 160 },
@@ -29,19 +43,13 @@ const columns: GridColDef[] = [
 
 export const Tabela: React.FC<ITabela> = ({ rows = [], loading = false }) => {
   const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
   const navigate = useNavigate();
-  const [copied, setCopied] = useState(false);
-  const [url, setUrl] = useState("");
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState<"success" | "error">("success");
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // Reseta o estado após 2 segundos
-    } catch (error) {
-      console.error("Falha ao copiar a URL:", error);
-    }
-  };
+
 
   const handleRowSelectionChange = (selection: GridRowSelectionModel) => {
     setSelectedRows(selection);
@@ -49,22 +57,22 @@ export const Tabela: React.FC<ITabela> = ({ rows = [], loading = false }) => {
 
   const handleEdit = () => {
     if (selectedRows.length === 1) {
-      navigate(`/edit/${selectedRows[0]}`);
+      navigate(`/barco/cadastro/${selectedRows[0]}`);
     } else {
-      alert('Selecione apenas uma linha para editar.');
+      showAlert('Selecione apenas uma linha para editar.', 'error');
     }
   };
 
-  const handleVisualizar = () => {
+  const handleVisualizar = async () => {
     if (selectedRows.length === 1) {
-      setUrl(`http://localhost:5173/catalogo/barco/${selectedRows[0]}`)
-      handleCopy()
-      if(copied){
-        alert('Link da página foi copiado!')
-      }
+      navigator.clipboard.writeText(`http://localhost:5173/catalogo/barco/${selectedRows[0]}`);
+      
+      showAlert('Link da página foi copiado!', 'success')
+      await delay(2000)
+      
       navigate(`/catalogo/barco/${selectedRows[0]}`);
     } else {
-      alert('Selecione apenas uma linha para editar.');
+      showAlert('Selecione apenas uma linha para editar.', 'error');
     }
   };
 
@@ -84,18 +92,30 @@ export const Tabela: React.FC<ITabela> = ({ rows = [], loading = false }) => {
         );
   
         if (response.ok) {
-          alert("Excluído com sucesso!");
+          showAlert("Excluído com sucesso!", "success");
+          await delay(2000)
           location.reload();
 
         } else {
-          alert("Não foi possível excluir!");
+          showAlert("Não foi possível excluir!", "error");
+          
         }
       } catch (error) {
-        console.error("Erro ao tentar excluir:", error);
+        showAlert("Erro ao tentar excluir. Tente novamente mais tarde.", "error");
       }
     } else {
-      alert("Selecione apenas uma linha para excluir.");
+      showAlert("Selecione apenas uma linha para excluir.", "error");
     }
+  };
+  
+  const showAlert = (message: string, severity: "success" | "error") => {
+    setAlertMessage(message);
+    setAlertSeverity(severity);
+    setAlertOpen(true);
+  };
+
+  const handleCloseAlert = () => {
+    setAlertOpen(false);
   };
   
   const paginationModel = { page: 0, pageSize: 10 };
@@ -103,7 +123,7 @@ export const Tabela: React.FC<ITabela> = ({ rows = [], loading = false }) => {
   return (
     <>
       {selectedRows.length > 0 && (
-          // <BarraCrud ></BarraCrud>
+          
           <Box
             sx={{
               display: 'flex',
@@ -125,6 +145,16 @@ export const Tabela: React.FC<ITabela> = ({ rows = [], loading = false }) => {
           </Box>
         )}
       <Paper sx={{ height: '100%', width: '100%', position: 'relative' }}>
+      <Snackbar
+        open={alertOpen}
+        autoHideDuration={4000}
+        onClose={handleCloseAlert}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={handleCloseAlert} severity={alertSeverity} sx={{ width: "100%" }}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
         <DataGrid
           rows={rows}
           columns={columns}

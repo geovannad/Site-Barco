@@ -44,7 +44,7 @@ export const Catalogo = () => {
             headers: {
               "Content-Type": "application/json",
               Authorization: token || "",
-            },
+            }
           }
         );
 
@@ -54,7 +54,7 @@ export const Catalogo = () => {
           setFilteredRows(data); 
           console.log("data:", data);
         } else {
-          console.error("Failed to fetch data");
+          console.log("Failed to fetch data");
         }
       } catch (error) {
         console.error("Error fetching data:", error);

@@ -8,7 +8,7 @@ import BoatForm from "../../shared/components/form-barco/FormBarco";
 const Cadastro: React.FC = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const { idBarco } = useParams<{ idBarco: string | null }>();
+  const { idBarco } = useParams<{ idBarco: string | undefined }>();
 
   const [editar, setEditar] = useState(false);
 
