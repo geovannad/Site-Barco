@@ -28,6 +28,8 @@ export const LayoutBase: React.FC<ILayoutBaseProps> = ({ children, titulo, barra
         )}
 
         <Typography
+          
+        sx={{ color: '#2D3E40', fontWeight: 500 }}
           overflow="hidden"
           whiteSpace="nowrap"
           textOverflow="ellipses"

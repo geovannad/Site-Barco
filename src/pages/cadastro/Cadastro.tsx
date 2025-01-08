@@ -29,7 +29,7 @@ const Cadastro: React.FC = () => {
     <MenuLateral>
       <Box>
         <LayoutBase
-          titulo={editar ? "Editando Informações" : "Cadastrando Barco"}
+          titulo={editar ? "Editando Informações" : "Cadastro de Barco"}
           children={<BoatForm idBarco={idBarco}/>}
         >
           

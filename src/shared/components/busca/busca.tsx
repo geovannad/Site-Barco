@@ -6,12 +6,14 @@ import {
   MenuItem,
   Select,
   TextField,
-  Paper,
+  
   Collapse,
   IconButton,
+  useTheme,
 } from "@mui/material";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import ClearIcon from "@mui/icons-material/Clear";
+
 
 
 interface BarraBuscaProps {
@@ -46,11 +48,11 @@ const BarraBusca: React.FC<BarraBuscaProps> = ({
   clearFilters,
 }) => {
   const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
-
+  const theme = useTheme();
   const toggleFilters = () => setIsFiltersExpanded((prev) => !prev);
 
   return (
-    <Paper
+    <Box
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -176,7 +178,8 @@ const BarraBusca: React.FC<BarraBuscaProps> = ({
             sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}
           >
             <Button
-              variant="outlined"
+              variant="contained"       
+              sx={{ backgroundColor: theme.palette.primary.light, color:'#2D3E40' }}
               size="small"
               fullWidth
               onClick={clearFilters}
@@ -195,7 +198,7 @@ const BarraBusca: React.FC<BarraBuscaProps> = ({
           </Box>
         </Box>
       </Collapse>
-    </Paper>
+    </Box>
   );
 };
 

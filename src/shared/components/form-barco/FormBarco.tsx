@@ -16,6 +16,8 @@ import {
   OutlinedInput,
   ListItemText,
   Snackbar,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 
 interface BoatResponse {
@@ -86,17 +88,27 @@ interface IBoatFormProps {
   idBarco: string | undefined;
 }
 
-const STATUS_OPTIONS = ["Available", "Sold", "Reserved"];
+const STATUS_OPTIONS = ["Ativas e Pendentes", "Ativas", "Pendentes"];
 const EQUIPMENT_OPTIONS = [
+  "Antena TV", 
+  "Ar Condicionado",
+  "Boiler", 
+  "Browthruster",
+  "Bússola",
+  "Capa", "Capota", "Carregador de Baterias", "Carreta", "Churrasqueira", "Chuveiro de Popa", "Chistaleira", "Comando  Eletrônico", "Dessalinizador", "Direção Hidráulica", "DVD", "Estabilizador", "Faróis", "Farol Robotizado", "Fechamento Completo", "Flaps Hidráulicos", "Fogão Elétrico",
+  "Freezer", "Geladeira", "Geleira", "Gerador",
   "GPS",
-  "Radar",
-  "Sound System",
-  "Fish Finder",
-  "Anchor",
-  "Life Jackets",
+  "GPS Fly",
+  "Guicho Elétrico",
+  "Home Theater",
+  "Icemaker",
+  "Iluminação Subaquática", "Inversor",
+  "Joystick", "Plataforma Submergível", "Microondas", "Passarela Hidráulica", "Piloto Automático", "Plotter", "Projetor / Telão", "Radar", "Rádio VHF", "Rádio VHF Fly", "Sky", "Solário de Popa", "Sólario de Proa", "Som", "Sonda", "Strobolight", "Tapete Emborachado", "Targa", "Teka Patamar de Popa", "Teka Praça de Popa", "Teka Cockpit", "Teka Passadiço", "Teka Proa", "Televisão", "Toldo", "Tomada de Cais", "Turco de Popa", "Ventilador", "WC Elétrico", "WC Manual", "Defensa", "Extintor"
 ];
 
 const BoatForm: React.FC<IBoatFormProps> = ({ idBarco }) => {
+  const theme = useTheme()
+  const smDown = useMediaQuery(theme.breakpoints.down('sm'))
   const [formData, setFormData] = useState<BoatResponse>({
     id: "",
     idBarco: 0,
@@ -297,12 +309,49 @@ const BoatForm: React.FC<IBoatFormProps> = ({ idBarco }) => {
     fetchData();
   }, [idBarco]);
 
+    
+  const selectAllEquipment = () => {
+    setFormData({
+      ...formData,
+      equipment: EQUIPMENT_OPTIONS,
+    });
+  };
+
+
+  const deselectAllEquipment = () => {
+    setFormData({
+      ...formData,
+      equipment: [],
+    });
+  };
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+  
+    setFormData((prev) => {
+      let updatedEquipment = [...prev.equipment];    
+      if (value) {
+        const equipmentWithQuantity = `${name} - Quantidade: ${value}`;
+        updatedEquipment = updatedEquipment.filter((item) => !item.startsWith(name));
+        updatedEquipment.push(equipmentWithQuantity);
+      } else {
+        updatedEquipment = updatedEquipment.filter((item) => !item.startsWith(name));
+      }
+  
+      return {
+        ...prev,
+        equipment: updatedEquipment,
+      };
+    });
+  };
+  
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
@@ -768,26 +817,88 @@ const BoatForm: React.FC<IBoatFormProps> = ({ idBarco }) => {
                 onBlur={handleWordInputBlur}
               />
             </Grid>
-
+                  
+            
             <Grid item xs={12}>
-              <Typography variant="h6">Equipamentos</Typography>
-            </Grid>
-            {EQUIPMENT_OPTIONS.map((equipment) => (
-              <Grid item xs={6} sm={4} key={equipment}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={formData.equipment.includes(equipment)}
-                      onChange={handleEquipmentChange}
-                      name={equipment}
-                    />
-                  }
-                  label={equipment}
-                />
-              </Grid>
-            ))}
+  <Typography variant="h6">Equipamentos</Typography>
+  <Grid item xs={12} sm={6} md={4} sx={{ display: 'flex', gap: '10px', flexDirection: smDown ? 'column' : 'row', paddingTop: '10px' }}>
+  <Button variant="contained" onClick={selectAllEquipment}>
+    Selecionar Todos
+  </Button>
 
-            <Grid item xs={12}>
+  <Button variant="outlined" onClick={deselectAllEquipment}>
+    Desmarcar Todos
+  </Button>
+</Grid>
+</Grid>
+
+
+
+
+
+       
+      {EQUIPMENT_OPTIONS.map((equipment) => (
+        <Grid item xs={6} sm={4} key={equipment}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={formData.equipment.includes(equipment)}
+                onChange={handleEquipmentChange}
+                name={equipment}
+              />
+            }
+            label={equipment}
+          />
+        </Grid>
+      ))}
+
+<Grid item xs={6} sm={4}>
+  <TextField
+    label="Gerador KVA"
+    type="number"
+    name="Gerador KVA" 
+    value={formData.equipment.find((item) => item.startsWith("Gerador KVA"))?.split(" - Quantidade: ")[1] || ""}
+    onChange={handleQuantityChange} 
+    fullWidth
+  />
+</Grid>
+<Grid item xs={6} sm={4}>
+  <TextField
+    label="Gerador Horas"
+    type="number"
+    name="Gerador Horas" 
+    value={formData.equipment.find((item) => item.startsWith("Gerador Horas"))?.split(" - Quantidade: ")[1] || ""}
+    onChange={handleQuantityChange} 
+    fullWidth
+  />
+</Grid>
+<Grid item xs={6} sm={4}>
+  <TextField
+    label="Quartos"
+    type="number"
+    name="Quartos" 
+    value={formData.equipment.find((item) => item.startsWith("Quartos"))?.split(" - Quantidade: ")[1] || ""}
+    onChange={handleQuantityChange} 
+    fullWidth
+  />
+</Grid>
+<Grid item xs={6} sm={4}>
+  <TextField
+    label="Banheiros"
+    type="number"
+    name="Banheiros " 
+    value={formData.equipment.find((item) => item.startsWith("Banheiros "))?.split(" - Quantidade: ")[1] || ""}
+    onChange={handleQuantityChange} 
+    fullWidth
+  />
+</Grid>
+
+
+
+      
+      
+     
+                <Grid item xs={12}>
               <Typography variant="h6">Observações</Typography>
             </Grid>
             <Grid item xs={12}>

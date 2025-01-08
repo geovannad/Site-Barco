@@ -114,7 +114,7 @@ export const Catalogo = () => {
     <MenuLateral>
       <Box>
         <LayoutBase
-          titulo="Catálogo de barcos"
+          titulo="Catálogo dos Barcos"
           barraDeFerramentas={
             <BarraBusca
               searchQuery={searchQuery}
