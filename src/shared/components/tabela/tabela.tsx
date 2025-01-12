@@ -16,6 +16,17 @@ interface ITabela {
 
 const columns: GridColDef[] = [
   { field: 'id', headerName: 'ID', width: 70, type: "string" },
+  {
+    field: 'photo', headerName: 'Foto', width: 70, renderCell: (params) => {
+      return (
+        <img
+          src={params.value} 
+          alt="Boat Photo"
+          style={{ width: 50, height: 50, objectFit: 'cover' }} 
+        />
+      );
+    }
+  },
   { field: 'name', headerName: 'Nome', width: 130,  renderCell: (params) => (
     <div style={{ color: '#2D3E40', fontWeight:'bold', textTransform: 'uppercase' }}>
       {params.value}
