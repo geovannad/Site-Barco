@@ -102,8 +102,10 @@ export const Tabela: React.FC<ITabela> = ({ rows = [], loading = false }) => {
 
   const handleVisualizar = async () => {
     if (selectedRows.length === 1) {
+      require('dotenv').config();
+      const port = process.env.API_URL;
       navigator.clipboard.writeText(
-        `http://localhost:5173/catalogo/barco/${selectedRows[0]}`
+        `http://${port}/catalogo/barco/${selectedRows[0]}`
       );
 
       showAlert("Link da página foi copiado!", "success");
@@ -119,9 +121,11 @@ export const Tabela: React.FC<ITabela> = ({ rows = [], loading = false }) => {
     if (selectedRows.length === 1) {
       const token = localStorage.getItem("token");
       try {
+        require('dotenv').config();
+        const API_URL = process.env.API_URL;
         const response = await fetch(
-          `https://ms-internautica-crm.onrender.com/boat/delete/${selectedRows[0]}`,
-          {
+          `${API_URL}/boat/delete/${selectedRows[0]}`,
+          {   
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",

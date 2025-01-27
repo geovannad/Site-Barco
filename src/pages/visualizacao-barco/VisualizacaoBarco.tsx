@@ -71,11 +71,12 @@ export default function BoatDetails() {
       setLoading(false);
       return;
     }
-
     const getById = async () => {
       try {
+        require('dotenv').config();
+        const API_URL = process.env.API_URL;
         const response = await fetch(
-          `https://ms-internautica-crm.onrender.com/boat/get-by-id/${idBarco}`,
+          `${API_URL}/boat/get-by-id/${idBarco}`,
           {
             method: "GET",
             headers: {

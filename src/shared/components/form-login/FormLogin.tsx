@@ -37,7 +37,9 @@ const FormLogin: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://ms-internautica-crm.onrender.com/login", {
+      require('dotenv').config();
+      const API_URL = process.env.API_URL;
+      const response = await fetch(API_URL+"/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

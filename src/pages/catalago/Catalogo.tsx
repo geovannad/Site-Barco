@@ -40,9 +40,12 @@ export const Catalogo = () => {
     const rowsFind = async () => {
       const token = localStorage.getItem("token");
       const timestamp = new Date().getTime();
+      require('dotenv').config();
+
+      const API_URL = process.env.API_URL;
       try {
         const response = await fetch(
-          `https://ms-internautica-crm.onrender.com/boat/find-all?timestamp=${timestamp}`,
+          `${API_URL}/boat/find-all?timestamp=${timestamp}`,
           {
             method: "GET",
             headers: {

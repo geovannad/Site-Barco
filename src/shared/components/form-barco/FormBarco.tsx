@@ -233,10 +233,11 @@ const BoatForm: React.FC<IBoatFormProps> = ({ idBarco }) => {
       showAlert("Existem erros no formulário", "error");
       return;
     }
-
+    require('dotenv').config();
+    const API_URL = process.env.API_URL;
     const url = idBarco
-      ? `https://ms-internautica-crm.onrender.com/boat/update/${idBarco}`
-      : "https://ms-internautica-crm.onrender.com/boat/create";
+      ? `${API_URL}/boat/update/${idBarco}`
+      : API_URL+"/boat/create";
 
     const method = idBarco ? "PUT" : "POST";
 
@@ -288,10 +289,11 @@ const BoatForm: React.FC<IBoatFormProps> = ({ idBarco }) => {
 
     const fetchData = async () => {
       setLoading(true);
-
+      require('dotenv').config();
+      const API_URL = process.env.API_URL;
       try {
         const response = await fetch(
-          `https://ms-internautica-crm.onrender.com/boat/get-by-id/${idBarco}`
+          API_URL+`/boat/get-by-id/${idBarco}`
         );
 
         if (!response.ok) {
