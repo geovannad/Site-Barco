@@ -6,7 +6,11 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Tabela } from "../../shared/components/tabela/tabela";
 
-
+interface RowType {
+  status: string;
+  value: number;
+  size: number;
+}
 
 export const Catalogo = () => {
   const navigate = useNavigate();
@@ -19,8 +23,8 @@ export const Catalogo = () => {
     }
   }, [navigate, token]);
 
-  const [rows, setRows] = useState([]);
-  const [filteredRows, setFilteredRows] = useState([]); 
+  const [rows, setRows] = useState<RowType[]>([]);
+  const [filteredRows, setFilteredRows] = useState<RowType[]>([]); 
   const [searchQuery, setSearchQuery] = useState<string>(""); 
   const [filters, setFilters] = useState({
     status: "Ativas e Pendentes",
@@ -66,25 +70,26 @@ export const Catalogo = () => {
     rowsFind();
   }, []);
 
-  const applyFilters = () => {
-    setFilteredRows(
-      rows.filter((row) => {
-        const matchesStatus =
-          filters.status === "Ativas e Pendentes" ||
-          row.status === filters.status;
+  useEffect(() => {
+    const query = searchQuery.toLowerCase();
 
-        const matchesValor =
-          (filters.valorMin === undefined || row.value >= filters.valorMin) &&
-          (filters.valorMax === undefined || row.value <= filters.valorMax);
- 
-        const matchesTamanho =
-          (filters.tamanhoMin === undefined || row.size >= filters.tamanhoMin) &&
-          (filters.tamanhoMax === undefined || row.size <= filters.tamanhoMax);
+    const filteredData = rows.filter(row => {
+      const matchesSearch = Object.values(row).some(value =>
+        value?.toString().toLowerCase().includes(query)
+      );
 
-        return matchesStatus && matchesValor && matchesTamanho;
-      })
-    );
-  };
+      const matchesFilters =
+        (filters.status === "Ativas e Pendentes" || row.status === filters.status) &&
+        (filters.valorMin === undefined || row.value >= filters.valorMin) &&
+        (filters.valorMax === undefined || row.value <= filters.valorMax) &&
+        (filters.tamanhoMin === undefined || row.size >= filters.tamanhoMin) &&
+        (filters.tamanhoMax === undefined || row.size <= filters.tamanhoMax);
+
+      return matchesSearch && matchesFilters;
+    });
+
+    setFilteredRows(filteredData);
+  }, [searchQuery, rows, filters]);
 
   const clearFilters = () => {
     setFilters({
@@ -97,19 +102,6 @@ export const Catalogo = () => {
     setFilteredRows(rows); 
   };
 
-  useEffect(() => {
-    const query = searchQuery.toLowerCase();
-  
-    setFilteredRows(
-      rows.filter(row =>
-        Object.values(row).some(value =>
-          value?.toString().toLowerCase().includes(query)
-        )
-      )
-    );
-  }, [searchQuery, rows]);
-  
-
   return (
     <MenuLateral>
       <Box>
@@ -121,10 +113,9 @@ export const Catalogo = () => {
               setSearchQuery={setSearchQuery}
               filters={filters}
               setFilters={setFilters}
-              applyFilters={applyFilters}
+              applyFilters={() => setFilteredRows(rows)} // Se desejar implementar manualmente filtros
               clearFilters={clearFilters}
             />
-        
           }
           children={null}
         />

@@ -60,9 +60,9 @@ interface Sailor {
 }
 
 interface Owner {
-  name: string;
-  number: string;
-  email: string;
+  name?: string;
+  number?: string;
+  email?: string;
 }
 
 interface Announcement {
@@ -150,6 +150,7 @@ const BoatForm: React.FC<IBoatFormProps> = ({ idBarco }) => {
   const [loading, setLoading] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const [error, setError] = useState(false);
+  setError(false)
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
     "success"
@@ -370,18 +371,6 @@ const BoatForm: React.FC<IBoatFormProps> = ({ idBarco }) => {
     }));
   };
 
-  const handleAnnouncementChange = (
-    name: keyof Announcement,
-    checked: boolean
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      announcement: {
-        ...prev.announcement,
-        [name]: checked,
-      },
-    }));
-  };
 
   const handleEquipmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
@@ -752,21 +741,26 @@ const BoatForm: React.FC<IBoatFormProps> = ({ idBarco }) => {
               <Typography variant="h6">Proprietário</Typography>
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                label="Nome"
-                name="owner.name"
-                value={formData.owner?.name || ""}
-                onChange={(e) => {
-                  const { value } = e.target;
-                  setFormData((prev) => ({
-                    ...prev,
-                    owner: { ...prev.owner, name: value },
-                  }));
-                }}
-              />
-            </Grid>
+  <TextField
+    required
+    fullWidth
+    label="Nome"
+    name="owner.name"
+    value={formData.owner?.name || ""}
+    onChange={(e) => {
+      const { value } = e.target;
+      setFormData((prev) => ({
+        ...prev,
+        owner: {
+          ...prev.owner,
+          name: value,
+          number: prev.owner?.number || "", // Garantir que 'number' seja uma string (não undefined)
+        },
+      }));
+    }}
+  />
+</Grid>
+
             <Grid item xs={12} sm={6}>
               <TextField
                 required
@@ -803,20 +797,21 @@ const BoatForm: React.FC<IBoatFormProps> = ({ idBarco }) => {
               <Typography variant="h6">Palavras-Chave</Typography>
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Palavras-chave (separadas por ponto e vírgula)"
-                name="keywords"
-                value={(formData.keywords as unknown as string) || ""}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    keywords: e.target.value,
-                  }))
-                }
-                onBlur={handleWordInputBlur}
-              />
-            </Grid>
+  <TextField
+    fullWidth
+    label="Palavras-chave (separadas por ponto e vírgula)"
+    name="keywords"
+    value={(formData.keywords as unknown as string) || ""}
+    onChange={(e) =>
+      setFormData((prev) => ({
+        ...prev,
+        keywords: e.target.value.split(";").map((keyword) => keyword.trim()),
+      }))
+    }
+    onBlur={handleWordInputBlur}
+  />
+</Grid>
+
                   
             
             <Grid item xs={12}>
