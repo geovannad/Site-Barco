@@ -103,7 +103,7 @@ export const Tabela: React.FC<ITabela> = ({ rows = [], loading = false }) => {
   const handleVisualizar = async () => {
     if (selectedRows.length === 1) {
       require('dotenv').config();
-      const port = process.env.API_URL;
+      const port = process.env.PORT;
       navigator.clipboard.writeText(
         `http://${port}/catalogo/barco/${selectedRows[0]}`
       );
