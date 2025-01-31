@@ -37,8 +37,7 @@ const FormLogin: React.FC = () => {
     setIsLoading(true);
 
     try {
-      require('dotenv').config();
-      const API_URL = process.env.API_URL;
+      const API_URL = 'http://51.222.111.75/api';
       const response = await fetch(API_URL+"/login", {
         method: "POST",
         headers: {
