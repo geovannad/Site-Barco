@@ -233,8 +233,7 @@ const BoatForm: React.FC<IBoatFormProps> = ({ idBarco }) => {
       showAlert("Existem erros no formulário", "error");
       return;
     }
-    require('dotenv').config();
-    const API_URL = process.env.API_URL;
+    const API_URL = import.meta.env.VITE_API_URL;
     const url = idBarco
       ? `${API_URL}/boat/update/${idBarco}`
       : API_URL+"/boat/create";
@@ -289,8 +288,7 @@ const BoatForm: React.FC<IBoatFormProps> = ({ idBarco }) => {
 
     const fetchData = async () => {
       setLoading(true);
-      require('dotenv').config();
-      const API_URL = process.env.API_URL;
+      const API_URL = import.meta.env.VITE_API_URL;
       try {
         const response = await fetch(
           API_URL+`/boat/get-by-id/${idBarco}`

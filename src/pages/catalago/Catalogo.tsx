@@ -40,9 +40,8 @@ export const Catalogo = () => {
     const rowsFind = async () => {
       const token = localStorage.getItem("token");
       const timestamp = new Date().getTime();
-      require('dotenv').config();
 
-      const API_URL = process.env.API_URL;
+      const API_URL = import.meta.env.VITE_API_URL;
       try {
         const response = await fetch(
           `${API_URL}/boat/find-all?timestamp=${timestamp}`,

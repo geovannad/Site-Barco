@@ -102,8 +102,7 @@ export const Tabela: React.FC<ITabela> = ({ rows = [], loading = false }) => {
 
   const handleVisualizar = async () => {
     if (selectedRows.length === 1) {
-      require('dotenv').config();
-      const port = process.env.PORT;
+      const port = import.meta.env.VITE_PORT;
       navigator.clipboard.writeText(
         `http://${port}/catalogo/barco/${selectedRows[0]}`
       );
@@ -121,8 +120,7 @@ export const Tabela: React.FC<ITabela> = ({ rows = [], loading = false }) => {
     if (selectedRows.length === 1) {
       const token = localStorage.getItem("token");
       try {
-        require('dotenv').config();
-        const API_URL = process.env.API_URL;
+        const API_URL = import.meta.env.VITE_API_URL;
         const response = await fetch(
           `${API_URL}/boat/delete/${selectedRows[0]}`,
           {   
