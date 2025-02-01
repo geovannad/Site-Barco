@@ -108,7 +108,7 @@ export const Tabela: React.FC<ITabela> = ({ rows = [], loading = false }) => {
       if (navigator.clipboard) {
         try {
           await navigator.clipboard.writeText(
-              `http://${port}/catalogo/barco/${selectedRows[0]}`
+              `https://${port}/catalogo/barco/${selectedRows[0]}`
         );
           showAlert("Link da página foi copiado!", "success");
           await delay(2000);
