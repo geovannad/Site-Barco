@@ -103,14 +103,24 @@ export const Tabela: React.FC<ITabela> = ({ rows = [], loading = false }) => {
   const handleVisualizar = async () => {
     if (selectedRows.length === 1) {
       const port = import.meta.env.VITE_PORT;
-      navigator.clipboard.writeText(
-        `http://${port}/catalogo/barco/${selectedRows[0]}`
-      );
 
-      showAlert("Link da página foi copiado!", "success");
-      await delay(2000);
-
-      navigate(`/catalogo/barco/${selectedRows[0]}`);
+      // Verificar se o navegador suporta a API de Clipboard
+      if (navigator.clipboard) {
+        try {
+          await navigator.clipboard.writeText(
+              `http://${port}/catalogo/barco/${selectedRows[0]}`
+        );
+          showAlert("Link da página foi copiado!", "success");
+          await delay(2000);
+          navigate(`/catalogo/barco/${selectedRows[0]}`);
+        } catch (error) {
+          console.error("Erro ao copiar para a área de transferência", error);
+          showAlert("Erro ao copiar o link.", "error");
+        }
+      } else {
+        console.error("A API de Clipboard não é suportada neste navegador.");
+        showAlert("A API de Clipboard não é suportada neste navegador.", "error");
+      }
     } else {
       showAlert("Selecione apenas uma linha para editar.", "error");
     }
