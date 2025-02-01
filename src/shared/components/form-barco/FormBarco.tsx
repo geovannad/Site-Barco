@@ -405,83 +405,96 @@ const BoatForm: React.FC<IBoatFormProps> = ({ idBarco }) => {
           <Alert severity="error">{error}</Alert>
         ) : (
           <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Typography variant="h6">Fotos</Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="outlined" component="label">
-                Upload de Fotos
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  hidden
-                  onChange={(e) => {
-                    const files = e.target.files;
-                    if (files) {
-                      const newPhotos = Array.from(files).map((file) =>
-                        URL.createObjectURL(file)
-                      );
-                      setFormData((prev) => ({
-                        ...prev,
-                        photos: [...prev.photos, ...newPhotos],
-                      }));
-                    }
-                  }}
-                />
-              </Button>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="subtitle1">Pré-visualização:</Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 2,
-                  flexWrap: "wrap",
-                  marginTop: 2,
-                }}
-              >
-                {formData.photos.map((photo, index) => (
-                  <Box
-                    key={index}
-                    sx={{
-                      position: "relative",
-                      width: 100,
-                      height: 100,
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <Typography variant="h6">Fotos</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Button variant="outlined" component="label">
+                  Upload de Fotos
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    hidden
+                    onChange={(e) => {
+                      const files = e.target.files;
+                      if (files) {
+                        Promise.all(
+                          Array.from(files).map((file) => {
+                            return new Promise<string>((resolve, reject) => { 
+                              const reader = new FileReader();
+                              reader.readAsDataURL(file);
+                              reader.onload = () => resolve(reader.result as string); 
+                              reader.onerror = reject;
+                            });
+                          })
+                        ).then((base64Images: string[]) => { 
+                          setFormData((prev) => ({
+                            ...prev,
+                            photos: [...prev.photos, ...base64Images],
+                            
+                          }));
+                          console.log(base64Images)
+                        });
+                        
+                      }
                     }}
-                  >
-                    <img
-                      src={photo}
-                      alt={`Foto ${index + 1}`}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        borderRadius: 8,
-                      }}
-                    />
-                    <Button
-                      onClick={() => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          photos: prev.photos.filter((_, i) => i !== index),
-                        }));
-                      }}
-                      size="small"
-                      color="secondary"
+                  />
+                </Button>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="subtitle1">Pré-visualização:</Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    flexWrap: "wrap",
+                    marginTop: 2,
+                  }}
+                >
+                  {formData.photos.map((photo, index) => (
+                    <Box
+                      key={index}
                       sx={{
-                        position: "absolute",
-                        top: 0,
-                        right: 0,
-                        backgroundColor: "rgba(0, 0, 0, 0.5)",
-                        color: "#fff",
+                        position: "relative",
+                        width: 100,
+                        height: 100,
                       }}
                     >
-                      Remover
-                    </Button>
-                  </Box>
-                ))}
-              </Box>
+                      <img
+                        src={photo}
+                        alt={`Foto ${index + 1}`}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          borderRadius: 8,
+                        }}
+                      />
+                      <Button
+                        onClick={() => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            photos: prev.photos.filter((_, i) => i !== index),
+                          }));
+                        }}
+                        size="small"
+                        color="secondary"
+                        sx={{
+                          position: "absolute",
+                          top: 0,
+                          right: 0,
+                          backgroundColor: "rgba(0, 0, 0, 0.5)",
+                          color: "#fff",
+                        }}
+                      >
+                        Remover
+                      </Button>
+                    </Box>
+                  ))}
+                </Box>
+              </Grid>
             </Grid>
 
             <Grid item xs={12}>

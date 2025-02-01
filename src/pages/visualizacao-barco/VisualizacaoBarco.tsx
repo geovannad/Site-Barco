@@ -124,20 +124,37 @@ export default function BoatDetails() {
           }}
         >
           <Carousel indicators={true} navButtonsAlwaysVisible>
-            {data?.photos.map((image, index) => (
+          {data?.photos.map((image, index) => {
+            const imageUrl = image.startsWith("data:image/")
+              ? image
+              : `data:image/jpeg;base64,${image}`;
+
+            return (
               <Box
                 key={index}
-                component="img"
-                src={image}
-                alt={`Imagem ${index + 1}`}
                 sx={{
-                  width: '100%',
-                  height: 'auto',
-                  objectFit: 'cover',
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                  height: "100%",
                 }}
-              />
-            ))}
-          </Carousel>
+              >
+                <img
+                  src={imageUrl}
+                  alt={`Imagem ${index + 1}`}
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "500px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  }}
+                />
+              </Box>
+            );
+          })}
+        </Carousel>
+
         </Box>
 
         <DivForms>

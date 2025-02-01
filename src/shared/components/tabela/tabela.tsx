@@ -24,15 +24,21 @@ const columns: GridColDef[] = [
     headerName: "Foto",
     width: 70,
     renderCell: (params) => {
+      const base64String = params.value || "";
+      const imageUrl = base64String.startsWith("data:image/")
+        ? base64String
+        : `data:image/jpeg;base64,${base64String}`;
+  
       return (
         <img
-          src={params.value}
+          src={imageUrl}
           alt="Boat Photo"
           style={{ width: 50, height: 50, objectFit: "cover" }}
         />
       );
     },
   },
+  
   {
     field: "name",
     headerName: "Nome",
