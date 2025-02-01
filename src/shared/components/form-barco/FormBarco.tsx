@@ -109,6 +109,7 @@ const EQUIPMENT_OPTIONS = [
 const BoatForm: React.FC<IBoatFormProps> = ({ idBarco }) => {
   const theme = useTheme()
   const smDown = useMediaQuery(theme.breakpoints.down('sm'))
+
   const [formData, setFormData] = useState<BoatResponse>({
     id: "",
     idBarco: 0,
@@ -149,8 +150,7 @@ const BoatForm: React.FC<IBoatFormProps> = ({ idBarco }) => {
 
   const [loading, setLoading] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
-  const [error, setError] = useState(false);
-  setError(false)
+  const [error] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
     "success"
