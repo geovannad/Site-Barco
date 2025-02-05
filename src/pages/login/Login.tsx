@@ -9,7 +9,7 @@ const Login = () => {
             <Wrapper>
                 <DivForms> 
                   <img src={Logo} width="100px"></img>
-                  <h1>Bergamin Boat</h1>
+                  <h1>Bergamin Boats</h1>
                   <SubTitle >Faça o login!</SubTitle>
                   <FormLogin />
                 </DivForms>

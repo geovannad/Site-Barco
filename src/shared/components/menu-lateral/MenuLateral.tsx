@@ -7,7 +7,7 @@ import ListItemText from '@mui/material/ListItemText';
 import FolderCopyIcon from '@mui/icons-material/FolderCopy';
 
 import { Box, useMediaQuery } from "@mui/system"
-import Barco from "../../../assets/download.png"
+import Barco from "../../../assets/logo.jpg"
 import { useDrawerContext } from "../../contexts";
 import { useNavigate } from "react-router-dom";
 import { Add } from "@mui/icons-material";
@@ -39,7 +39,7 @@ export const MenuLateral: React.FC<MenuLateralProps> = ({ children }) => {
                 <Box width={theme.spacing(30)} height="100%" display="flex" flexDirection="column" >
                     <Box width="100%" height={theme.spacing(24)} display="flex" alignItems="center" justifyContent="center" flexDirection="column" paddingTop="20px">
                         <Avatar sx={{ height: theme.spacing(12), width: theme.spacing(12)}} src={Barco}  />
-                        <h2>Bergamin Boat</h2>
+                        <h2>Bergamin Boats</h2>
                     </Box>
                     <Divider />
                     <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>

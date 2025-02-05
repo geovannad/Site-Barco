@@ -113,7 +113,7 @@ export default function BoatDetails() {
     <>
       <Div>
         <Img src={Logo}></Img>
-        <TitleLogo>Bergamin Boat</TitleLogo>
+        <TitleLogo>Bergamin Boats</TitleLogo>
       </Div>
       <Wrapper>
         <Box
